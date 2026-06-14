@@ -22,7 +22,7 @@ export default function AuthModal({ open, onClose, onAuthed }) {
     try {
       if (mode === 'login') await login(username.trim(), password);
       else await register(username.trim(), password, displayName.trim() || username.trim());
-      toast.success(mode === 'login' ? 'Welcome back.' : 'Account created. Step inside.');
+      toast.success(mode === 'login' ? 'welcome back.' : 'you\'re in.');
       onAuthed?.();
     } catch (err) {
       setError(apiErr(err));
@@ -32,7 +32,7 @@ export default function AuthModal({ open, onClose, onAuthed }) {
   };
 
   const enterAsGuest = () => {
-    toast('Riding as a guest. Your work is saved locally.', { icon: '🎫' });
+    toast('riding as guest. work saved on this device.', { icon: '🎫' });
     onAuthed?.();
   };
 
@@ -66,30 +66,28 @@ export default function AuthModal({ open, onClose, onAuthed }) {
             </button>
 
             <div className="relative p-8">
-              <p className="font-mono text-[10px] tracking-[0.3em] text-cyan uppercase mb-2">
-                ChalkMind Transit Pass
+              <p className="text-[10px] tracking-[0.3em] text-cyan uppercase mb-2">
+                transit pass
               </p>
-              <h2 className="font-display text-3xl font-extrabold tracking-tight">
-                {mode === 'login' ? 'Board the train' : 'Get your pass'}
+              <h2 className="text-2xl font-light tracking-tight lowercase">
+                {mode === 'login' ? 'log in' : 'get a pass'}
               </h2>
-              <p className="text-ash text-sm mt-1">
-                {mode === 'login'
-                  ? 'Pick up where the lesson left off.'
-                  : 'Create a pass to save your collections across rides.'}
+              <p className="text-ash text-sm mt-1 font-light">
+                {mode === 'login' ? 'pick up where you left off.' : 'save your work across rides.'}
               </p>
 
               <form onSubmit={submit} className="mt-6 space-y-4">
                 {mode === 'register' && (
                   <Field
-                    label="Display name"
+                    label="display name"
                     value={displayName}
                     onChange={setDisplayName}
-                    placeholder="Miles M."
+                    placeholder="miles m."
                     testId={CM.authDisplayName}
                   />
                 )}
                 <Field
-                  label="Username"
+                  label="username"
                   value={username}
                   onChange={setUsername}
                   placeholder="night_rider"
@@ -97,7 +95,7 @@ export default function AuthModal({ open, onClose, onAuthed }) {
                   required
                 />
                 <Field
-                  label="Password"
+                  label="password"
                   type="password"
                   value={password}
                   onChange={setPassword}
@@ -107,7 +105,7 @@ export default function AuthModal({ open, onClose, onAuthed }) {
                 />
 
                 {error && (
-                  <p data-testid={CM.authError} className="text-magenta text-sm font-medium">
+                  <p data-testid={CM.authError} className="text-magenta text-sm font-light">
                     {error}
                   </p>
                 )}
@@ -116,10 +114,10 @@ export default function AuthModal({ open, onClose, onAuthed }) {
                   type="submit"
                   disabled={busy}
                   data-testid={CM.authSubmit}
-                  className="w-full h-12 rounded-2xl bg-cyan text-ink font-bold tracking-wide flex items-center justify-center gap-2 hover:bg-white transition-colors disabled:opacity-60"
+                  className="w-full h-12 rounded-2xl bg-cyan text-ink font-medium tracking-wide flex items-center justify-center gap-2 hover:bg-white transition-colors disabled:opacity-60 lowercase"
                 >
                   {busy && <Loader2 size={18} className="animate-spin" />}
-                  {mode === 'login' ? 'Log in' : 'Create pass'}
+                  {mode === 'login' ? 'log in' : 'create pass'}
                 </button>
               </form>
 
@@ -130,16 +128,16 @@ export default function AuthModal({ open, onClose, onAuthed }) {
                     setMode(mode === 'login' ? 'register' : 'login');
                     setError('');
                   }}
-                  className="text-smoke hover:text-white transition-colors"
+                  className="text-smoke hover:text-white transition-colors font-light lowercase"
                 >
-                  {mode === 'login' ? 'Need a pass? Sign up' : 'Have a pass? Log in'}
+                  {mode === 'login' ? 'need a pass? sign up' : 'have a pass? log in'}
                 </button>
                 <button
                   data-testid={CM.authGuest}
                   onClick={enterAsGuest}
-                  className="flex items-center gap-1.5 text-ash hover:text-acid transition-colors font-mono text-xs uppercase tracking-wider"
+                  className="flex items-center gap-1.5 text-ash hover:text-acid transition-colors text-xs uppercase tracking-wider"
                 >
-                  <Ticket size={14} /> Ride as guest
+                  <Ticket size={14} /> ride as guest
                 </button>
               </div>
             </div>

@@ -3,12 +3,12 @@ import { motion } from 'framer-motion';
 import { CM } from '@/constants/testIds';
 
 const THOUGHTS = [
-  'Parsing the question…',
-  'Recalling core principles…',
-  'Choosing the right analogy…',
-  'Sketching the diagram…',
-  'Plotting the function…',
-  'Building a checkpoint…',
+  'reading your question…',
+  'recalling the basics…',
+  'picking an analogy…',
+  'sketching the diagram…',
+  'plotting it out…',
+  'writing a checkpoint…',
 ];
 
 // Glowing particle cluster + live "reasoning" stream shown while the agent works.
@@ -45,12 +45,12 @@ export default function ThinkingState() {
         </div>
 
         <div>
-          <p className="font-mono text-[10px] tracking-[0.3em] uppercase text-ink/40">ChalkMind is thinking</p>
+          <p className="text-[10px] tracking-[0.3em] uppercase text-ink/40 font-light">thinking</p>
           <motion.p
             key={step}
             initial={{ opacity: 0, y: 6 }}
             animate={{ opacity: 1, y: 0 }}
-            className="font-display font-bold text-xl text-ink mt-1"
+            className="text-xl text-ink mt-1 lowercase"
           >
             {THOUGHTS[step]}
           </motion.p>

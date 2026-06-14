@@ -12,10 +12,10 @@ export default function PromptInput({ onSubmit, busy, bloom, setBloom }) {
 
   const { recording, transcribing, toggle } = useRecorder({
     onText: (text, err) => {
-      if (err) return toast.error('Mic unavailable in this browser. Type instead.');
+      if (err) return toast.error('mic unavailable here. type instead.');
       if (text) {
         setValue((v) => (v ? `${v} ${text}` : text));
-        toast.success('Transcribed.');
+        toast.success('got it.');
       }
     },
   });
@@ -31,7 +31,7 @@ export default function PromptInput({ onSubmit, busy, bloom, setBloom }) {
     <div className="w-full max-w-3xl mx-auto">
       {/* bloom selector */}
       <div className="flex items-center gap-1.5 mb-2.5 overflow-x-auto no-scrollbar" data-testid={CM.bloomSelect}>
-        <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-ash shrink-0 mr-1">Depth</span>
+        <span className="text-[10px] uppercase tracking-[0.2em] text-ash shrink-0 mr-1 font-light">depth</span>
         {BLOOM.map((b) => (
           <button
             key={b}
@@ -62,7 +62,7 @@ export default function PromptInput({ onSubmit, busy, bloom, setBloom }) {
             }
           }}
           rows={1}
-          placeholder={recording ? 'Listening…' : 'Ask the agent to teach you anything…'}
+          placeholder={recording ? 'listening…' : 'ask anything…'}
           className="flex-1 bg-transparent resize-none outline-none text-white placeholder:text-ash py-2.5 max-h-40 text-[15px]"
           style={{ minHeight: 24 }}
         />
@@ -88,8 +88,8 @@ export default function PromptInput({ onSubmit, busy, bloom, setBloom }) {
           {busy ? <Loader2 size={18} className="animate-spin" /> : <ArrowUp size={20} strokeWidth={2.5} />}
         </button>
       </motion.div>
-      <p className="text-center font-mono text-[10px] text-ash/70 mt-2">
-        Enter to send · Shift+Enter for a new line · 🎤 voice dictation
+      <p className="text-center text-[10px] text-ash/70 mt-2 font-light">
+        enter to send · ⇧ + enter for a new line · 🎤 to speak
       </p>
     </div>
   );

@@ -219,7 +219,7 @@ export default function Workspace() {
             onClick={() => navigate('/')}
             className="h-10 px-3 rounded-xl glass hover:bg-white/10 transition-colors flex items-center gap-2 text-sm text-white/80"
           >
-            <Train size={16} className="text-cyan" /> <span className="hidden sm:inline font-mono text-xs">Exit</span>
+            <Train size={16} className="text-cyan" /> <span className="hidden sm:inline text-xs font-light">exit</span>
           </button>
           {user ? (
             <div data-testid={CM.userMenu} className="h-10 px-3 rounded-xl glass flex items-center gap-2 text-sm">
@@ -233,7 +233,7 @@ export default function Workspace() {
               onClick={() => setAuthOpen(true)}
               className="h-10 px-4 rounded-xl bg-cyan text-ink font-bold text-sm flex items-center gap-2 hover:bg-white transition-colors"
             >
-              <LogIn size={15} /> Log in
+              <LogIn size={15} /> log in
             </button>
           )}
         </div>

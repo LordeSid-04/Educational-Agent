@@ -30,7 +30,7 @@ export default function Sidebar({
       {/* header */}
       <div className="flex items-center justify-between p-4 h-16 shrink-0">
         {!collapsed && (
-          <span className="font-mono text-[10px] tracking-[0.25em] uppercase text-cyan">Collections</span>
+          <span className="text-[10px] tracking-[0.25em] uppercase text-cyan font-light">collections</span>
         )}
         <button
           data-testid={CM.sidebarToggle}
@@ -58,7 +58,7 @@ export default function Sidebar({
               value={name}
               onChange={(e) => setName(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && submitNew()}
-              placeholder="Collection name"
+              placeholder="collection name"
               className="flex-1 h-10 rounded-xl bg-white/5 border border-white/10 px-3 text-sm text-white outline-none focus:border-cyan/50"
             />
             <button onClick={submitNew} className="grid place-items-center w-9 h-9 rounded-lg bg-cyan text-ink"><Check size={16} /></button>
@@ -68,9 +68,9 @@ export default function Sidebar({
           <button
             onClick={() => setAdding(true)}
             data-testid={CM.newCollection}
-            className="w-full flex items-center gap-2 h-10 px-3 rounded-xl bg-cyan/15 text-cyan hover:bg-cyan/25 transition-colors font-semibold text-sm"
+            className="w-full flex items-center gap-2 h-10 px-3 rounded-xl bg-cyan/15 text-cyan hover:bg-cyan/25 transition-colors font-light text-sm"
           >
-            <Plus size={16} /> New collection
+            <Plus size={16} /> new collection
           </button>
         )}
       </div>
@@ -78,7 +78,7 @@ export default function Sidebar({
       {/* tree */}
       <div className="flex-1 overflow-y-auto no-scrollbar mt-3 px-3 pb-4 space-y-1">
         {projects.length === 0 && !collapsed && (
-          <p className="text-ash text-xs px-2 py-4 font-mono">No collections yet. Create one to start.</p>
+          <p className="text-ash text-xs px-2 py-4 font-light">no collections yet.</p>
         )}
         {projects.map((p) => {
           const active = p.id === activeProjectId;

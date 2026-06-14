@@ -1,6 +1,6 @@
 import { useRef } from 'react';
 import { motion, useScroll, useTransform, useMotionValue, useSpring } from 'framer-motion';
-import { ChevronDown, ArrowRight, Sparkles } from 'lucide-react';
+import { ChevronDown, ArrowRight } from 'lucide-react';
 import VinylRecord from '@/components/VinylRecord';
 import WorkspaceMock from '@/components/landing/WorkspaceMock';
 import { CM } from '@/constants/testIds';
@@ -148,43 +148,25 @@ export default function Hero({ onEnter }) {
           </motion.div>
         </motion.div>
 
-        {/* ════ HEADLINE ════ */}
+        {/* ════ MINIMAL HINT ════ */}
         <motion.div
           style={{ opacity: titleOpacity, y: titleY }}
-          className="relative z-30 h-screen flex flex-col justify-center px-6 sm:px-12 lg:px-20 pointer-events-none"
+          className="absolute left-6 sm:left-12 lg:left-20 bottom-28 z-30 max-w-sm pointer-events-none"
         >
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3, duration: 0.8 }}
-            className="max-w-3xl"
+            transition={{ delay: 0.4, duration: 0.8 }}
           >
-            <div className="inline-flex items-center gap-2 rounded-full glass px-4 py-1.5 mb-6">
-              <Sparkles size={14} className="text-acid" />
-              <span className="font-mono text-[11px] tracking-[0.25em] uppercase text-smoke">
-                Your tutor rides the underground
-              </span>
-            </div>
-            <h1 data-testid={CM.heroTitle} className="font-display font-black uppercase leading-[0.85] tracking-tighter text-6xl sm:text-7xl lg:text-8xl">
-              <span className="block drop-shadow-[0_4px_30px_rgba(0,0,0,0.8)]">Learn on the</span>
-              <span className="block comic text-cyan">Night Train.</span>
-            </h1>
-            <p className="mt-6 text-smoke text-base sm:text-lg max-w-xl leading-relaxed drop-shadow-[0_2px_12px_rgba(0,0,0,0.9)]">
-              ChalkMind is an AI teaching agent that sketches lessons on an infinite
-              chalkboard — scaffolding concepts the way a great tutor would, one
-              checkpoint at a time.
+            <p data-testid={CM.heroTitle} className="text-cyan text-xs sm:text-sm tracking-[0.35em] uppercase drop-shadow-[0_2px_10px_rgba(0,0,0,0.9)]">
+              learn on the night train
             </p>
-            <div className="mt-8 flex items-center gap-4 pointer-events-auto">
-              <button
-                data-testid={CM.heroEnter}
-                onClick={onEnter}
-                className="group h-13 px-7 py-3.5 rounded-2xl bg-white text-ink font-bold flex items-center gap-2 hover:bg-cyan transition-colors"
-              >
-                Step inside the screen
-                <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
-              </button>
-              <span className="font-mono text-xs text-ash hidden sm:block">or scroll to dive in ↓</span>
-            </div>
+            <p className="font-light text-smoke text-sm mt-3 leading-relaxed drop-shadow-[0_2px_10px_rgba(0,0,0,0.9)]">
+              an ai tutor that teaches on a moving chalkboard.
+            </p>
+            <p className="font-light text-ash text-xs mt-1 leading-relaxed drop-shadow-[0_2px_10px_rgba(0,0,0,0.9)]">
+              scroll to dive into his screen — or grab a pass up top.
+            </p>
           </motion.div>
         </motion.div>
 
@@ -204,10 +186,11 @@ export default function Hero({ onEnter }) {
         {/* CTA after arrival */}
         <motion.div style={{ opacity: ctaOpacity }} className="absolute bottom-16 left-1/2 -translate-x-1/2 z-40">
           <button
+            data-testid={CM.heroEnter}
             onClick={onEnter}
-            className="h-12 px-6 rounded-2xl bg-cyan text-ink font-bold flex items-center gap-2 hover:bg-white transition-colors shadow-[0_0_40px_rgba(0,240,255,0.5)]"
+            className="h-12 px-6 rounded-2xl bg-cyan text-ink font-medium flex items-center gap-2 hover:bg-white transition-colors shadow-[0_0_40px_rgba(0,240,255,0.5)]"
           >
-            Enter the workspace <ArrowRight size={18} />
+            enter the workspace <ArrowRight size={18} />
           </button>
         </motion.div>
       </div>

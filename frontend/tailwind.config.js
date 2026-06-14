@@ -8,8 +8,8 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        display: ['Unbounded', 'sans-serif'],
-        sans: ['Outfit', 'sans-serif'],
+        display: ['JetBrains Mono', 'monospace'],
+        sans: ['JetBrains Mono', 'monospace'],
         mono: ['JetBrains Mono', 'monospace'],
       },
       colors: {

@@ -21,34 +21,27 @@ const imgFor = (id) => {
 
 export function CollectionsView({ projects, onSelect, onNew }) {
   const items = projects.map((p) => ({
-    id: p.id,
-    title: p.name,
-    tag: 'Collection',
-    meta: 'Tap to open the board',
-    image: imgFor(p.id),
+    id: p.id, title: p.name, tag: 'collection', meta: 'open the board', image: imgFor(p.id),
   }));
 
   return (
     <div data-testid={CM.collectionsView} className="h-full flex flex-col">
       <div className="px-8 sm:px-12 pt-8 flex items-center justify-between">
         <div>
-          <p className="font-mono text-[11px] tracking-[0.3em] uppercase text-cyan">Collection Surfer</p>
-          <h1 className="font-display font-black text-4xl mt-2">Your collections</h1>
+          <p className="text-[11px] tracking-[0.3em] uppercase text-cyan font-light">collection surfer</p>
+          <h1 className="text-3xl mt-2 text-cyan font-light">your collections</h1>
         </div>
-        <button
-          onClick={onNew}
-          className="h-12 px-6 rounded-2xl bg-cyan text-ink font-bold flex items-center gap-2 hover:bg-white transition-colors"
-        >
-          <Plus size={18} /> New
+        <button onClick={onNew} className="h-11 px-5 rounded-2xl bg-cyan text-ink font-medium flex items-center gap-2 hover:bg-white transition-colors">
+          <Plus size={18} /> new
         </button>
       </div>
 
       {items.length === 0 ? (
         <div className="flex-1 grid place-items-center">
           <div className="text-center">
-            <FolderClosed size={48} className="mx-auto text-ash" />
-            <p className="text-smoke mt-4 max-w-xs">No collections yet. Create one and start surfing your topics in 3D.</p>
-            <button onClick={onNew} className="mt-5 h-11 px-6 rounded-2xl bg-white text-ink font-bold">Create collection</button>
+            <FolderClosed size={44} className="mx-auto text-ash" />
+            <p className="text-smoke font-light mt-4 max-w-xs text-sm">nothing here yet. make one and start surfing.</p>
+            <button onClick={onNew} className="mt-5 h-11 px-6 rounded-2xl bg-cyan text-ink font-medium">create collection</button>
           </div>
         </div>
       ) : (
@@ -61,54 +54,41 @@ export function CollectionsView({ projects, onSelect, onNew }) {
 }
 
 export function HomeView({ user, projects, onQuickStart, onBrowse }) {
-  const name = user?.displayName || 'rider';
+  const name = (user?.displayName || 'rider').split(' ')[0].toLowerCase();
   const stats = [
-    { icon: Layers, label: 'Collections', value: projects.length, color: '#00F0FF' },
-    { icon: BookOpen, label: 'Bloom levels', value: 6, color: '#FF5C00' },
-    { icon: Zap, label: 'Status', value: 'Live', color: '#FAFF00' },
+    { icon: Layers, label: 'collections', value: projects.length, color: '#00F0FF' },
+    { icon: BookOpen, label: 'depths', value: 6, color: '#FF5C00' },
+    { icon: Zap, label: 'status', value: 'live', color: '#FAFF00' },
   ];
   return (
-    <div className="h-full overflow-y-auto px-8 sm:px-12 py-10 pb-28">
+    <div className="h-full overflow-y-auto px-8 sm:px-12 py-12 pb-28">
       <div className="mx-auto max-w-4xl">
-        <p className="font-mono text-[11px] tracking-[0.3em] uppercase text-cyan">Welcome back</p>
-        <h1 className="font-display font-black text-5xl mt-3 tracking-tight">
-          Evening, <span className="text-cyan">{name}</span>.
+        <p className="text-[11px] tracking-[0.3em] uppercase text-cyan font-light">welcome back</p>
+        <h1 className="text-4xl mt-3 font-light">
+          hey <span className="text-cyan">{name}</span>.
         </h1>
-        <p className="text-smoke mt-3 text-lg max-w-xl">
-          The board is wiped clean. Ask the Teaching Agent something, or surf your collections.
-        </p>
+        <p className="text-smoke font-light mt-3 text-base max-w-md">board's clean. ask something, or surf your collections.</p>
 
         <div className="grid grid-cols-3 gap-4 mt-10">
           {stats.map((s) => (
-            <motion.div
-              key={s.label}
-              whileHover={{ y: -4 }}
-              className="rounded-2xl glass p-5 relative overflow-hidden"
-            >
-              <div className="halftone absolute inset-0 opacity-20" />
+            <motion.div key={s.label} whileHover={{ y: -4 }} className="rounded-2xl glass p-5">
               <s.icon size={20} style={{ color: s.color }} />
-              <div className="font-display font-black text-3xl mt-3">{s.value}</div>
-              <div className="font-mono text-[10px] uppercase tracking-wider text-ash mt-1">{s.label}</div>
+              <div className="text-3xl mt-3 font-light lowercase">{s.value}</div>
+              <div className="text-[10px] uppercase tracking-wider text-ash mt-1 font-light">{s.label}</div>
             </motion.div>
           ))}
         </div>
 
         <div className="grid sm:grid-cols-2 gap-4 mt-6">
-          <button
-            onClick={onQuickStart}
-            className="group text-left rounded-2xl bg-cyan text-ink p-6 hover:bg-white transition-colors"
-          >
+          <button onClick={onQuickStart} className="group text-left rounded-2xl bg-cyan text-ink p-6 hover:bg-white transition-colors">
             <Sparkles size={22} />
-            <h3 className="font-display font-bold text-xl mt-3">Open the chalkboard</h3>
-            <p className="text-ink/70 text-sm mt-1">Start a fresh lesson with the Teaching Agent.</p>
+            <h3 className="text-xl mt-3">open the board</h3>
+            <p className="text-ink/70 font-light text-sm mt-1">start a fresh lesson.</p>
           </button>
-          <button
-            onClick={onBrowse}
-            className="group text-left rounded-2xl glass p-6 hover:bg-white/10 transition-colors"
-          >
+          <button onClick={onBrowse} className="group text-left rounded-2xl glass p-6 hover:bg-white/10 transition-colors">
             <Layers size={22} className="text-warm" />
-            <h3 className="font-display font-bold text-xl mt-3">Surf collections</h3>
-            <p className="text-smoke text-sm mt-1">Browse your topics on the 3D perspective rail.</p>
+            <h3 className="text-xl mt-3 text-cyan">surf collections</h3>
+            <p className="text-smoke font-light text-sm mt-1">browse your topics in 3d.</p>
           </button>
         </div>
       </div>
@@ -119,19 +99,17 @@ export function HomeView({ user, projects, onQuickStart, onBrowse }) {
 export function SettingsView() {
   const { user, logout } = useAuth();
   return (
-    <div className="h-full overflow-y-auto px-8 sm:px-12 py-10">
+    <div className="h-full overflow-y-auto px-8 sm:px-12 py-12">
       <div className="mx-auto max-w-2xl">
-        <p className="font-mono text-[11px] tracking-[0.3em] uppercase text-cyan">Settings</p>
-        <h1 className="font-display font-black text-4xl mt-2">Your pass</h1>
+        <p className="text-[11px] tracking-[0.3em] uppercase text-cyan font-light">settings</p>
+        <h1 className="text-3xl mt-2 font-light">your pass</h1>
 
         <div className="mt-8 rounded-2xl glass p-6 flex items-center gap-4">
-          <span className="grid place-items-center w-14 h-14 rounded-2xl bg-cyan/15 text-cyan">
-            <User size={24} />
-          </span>
+          <span className="grid place-items-center w-14 h-14 rounded-2xl bg-cyan/15 text-cyan"><User size={24} /></span>
           <div className="flex-1">
-            <div className="font-display font-bold text-xl">{user?.displayName || 'Guest rider'}</div>
-            <div className="font-mono text-xs text-ash mt-0.5">
-              {user ? `@${user.username}` : 'Riding as a guest — work saved on this device'}
+            <div className="text-xl">{user?.displayName || 'guest rider'}</div>
+            <div className="text-xs text-ash mt-0.5 font-light">
+              {user ? `@${user.username}` : 'guest — saved on this device'}
             </div>
           </div>
         </div>
@@ -140,20 +118,11 @@ export function SettingsView() {
           <button
             data-testid={CM.logoutBtn}
             onClick={logout}
-            className="mt-5 inline-flex items-center gap-2 h-11 px-6 rounded-2xl border border-magenta/40 text-magenta hover:bg-magenta/10 transition-colors font-semibold"
+            className="mt-5 inline-flex items-center gap-2 h-11 px-6 rounded-2xl border border-magenta/40 text-magenta hover:bg-magenta/10 transition-colors font-light"
           >
-            <LogOut size={16} /> Log out
+            <LogOut size={16} /> log out
           </button>
         )}
-
-        <div className="mt-10 rounded-2xl glass p-6">
-          <h3 className="font-display font-bold text-lg">About the build</h3>
-          <p className="text-smoke text-sm mt-2 leading-relaxed">
-            Frontend wired to the ChalkMind API (auth, projects, chats, lesson generation, audio
-            transcribe). The Teaching Agent renders structured visual lessons on a brutalist
-            black-and-white board. Voice transcription is mocked in this demo.
-          </p>
-        </div>
       </div>
     </div>
   );

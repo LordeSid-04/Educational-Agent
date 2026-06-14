@@ -7,10 +7,10 @@ import PromptInput from '@/components/workspace/PromptInput';
 import { CM } from '@/constants/testIds';
 
 const SUGGESTIONS = [
-  'Explain how neural networks learn',
-  'Teach me the Pythagorean theorem',
-  'What is gradient descent?',
-  'Break down photosynthesis',
+  'how do neural networks learn?',
+  'explain the pythagorean theorem',
+  'what is gradient descent?',
+  'break down photosynthesis',
 ];
 
 export default function TeachingPanel({ title, segments, thinking, busy, bloom, setBloom, onSubmit, onContinue }) {
@@ -30,8 +30,8 @@ export default function TeachingPanel({ title, segments, thinking, busy, bloom, 
           <GraduationCap size={18} />
         </span>
         <div className="min-w-0">
-          <p className="font-mono text-[10px] tracking-[0.25em] uppercase text-ash">Teaching Agent</p>
-          <h1 className="font-display font-bold text-lg leading-none mt-0.5 truncate">{title || 'The Chalkboard'}</h1>
+          <p className="text-[10px] tracking-[0.25em] uppercase text-ash font-light">teaching agent</p>
+          <h1 className="text-lg leading-none mt-0.5 truncate lowercase">{title || 'the chalkboard'}</h1>
         </div>
       </div>
 
@@ -72,12 +72,12 @@ export default function TeachingPanel({ title, segments, thinking, busy, bloom, 
 function EmptyBoard({ onPick }) {
   return (
     <div className="text-ink text-center py-12">
-      <div className="inline-flex items-center gap-2 bg-ink text-paper px-4 py-1.5 rounded-sm font-mono text-[10px] tracking-[0.2em] uppercase">
-        <Sparkles size={13} /> Blank board
+      <div className="inline-flex items-center gap-2 bg-ink text-paper px-4 py-1.5 rounded-sm text-[10px] tracking-[0.2em] uppercase">
+        <Sparkles size={13} /> blank board
       </div>
-      <h2 className="font-display font-black text-3xl sm:text-4xl mt-5">What should we learn?</h2>
-      <p className="text-ink/60 mt-2 max-w-md mx-auto">
-        Type a question below, or start with one of these. The agent will sketch it out, step by step.
+      <h2 className="text-3xl sm:text-4xl mt-5 font-light lowercase">what should we learn?</h2>
+      <p className="text-ink/60 font-light mt-2 max-w-sm mx-auto text-sm">
+        type below, or tap one to start.
       </p>
       <div className="mt-7 flex flex-wrap justify-center gap-2.5 max-w-xl mx-auto">
         {SUGGESTIONS.map((s) => (

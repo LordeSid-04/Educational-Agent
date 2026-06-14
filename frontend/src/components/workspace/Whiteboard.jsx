@@ -26,7 +26,7 @@ function Segment({ seg, onContinue }) {
   switch (seg.type) {
     case 'heading':
       return (
-        <h2 className="font-display font-black text-3xl sm:text-4xl tracking-tight text-ink border-b-4 border-ink pb-3">
+        <h2 className="text-3xl sm:text-4xl tracking-tight text-ink border-b-4 border-ink pb-3 font-normal lowercase">
           {seg.content.text}
         </h2>
       );
@@ -260,7 +260,7 @@ function Checkpoint({ content, onContinue }) {
       <div className="absolute -top-3 left-5 bg-acid border-2 border-ink px-3 py-0.5 font-mono text-[10px] uppercase tracking-[0.2em] font-bold">
         Checkpoint
       </div>
-      <p className="font-display font-bold text-xl text-ink mt-2">{content.question}</p>
+      <p className="text-xl text-ink mt-2 font-normal">{content.question}</p>
       <div className="mt-4 space-y-2.5">
         {content.options.map((opt, i) => {
           const isPicked = picked === i;
