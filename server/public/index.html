@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>ChalkMind API Tester</title>
+  <style>
+    body { font-family: -apple-system, sans-serif; background: #0f1115; color: #e2e8f0; margin: 0; padding: 20px; }
+    button { background: #3b82f6; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; margin-right: 8px; margin-bottom: 8px; }
+    button:disabled { background: #475569; cursor: not-allowed; }
+    button.recording { background: #ef4444; }
+    .panel { background: #1e293b; padding: 16px; border-radius: 8px; margin-bottom: 16px; }
+    input[type="text"] { background: #0f1115; border: 1px solid #334155; color: white; padding: 8px; border-radius: 4px; width: 300px; }
+    pre { background: #0f1115; padding: 12px; border-radius: 4px; overflow-x: auto; font-size: 12px; border: 1px solid #334155; max-height: 300px; }
+    h2 { margin-top: 0; font-size: 16px; color: #94a3b8; border-bottom: 1px solid #334155; padding-bottom: 8px; }
+  </style>
+</head>
+<body>
+  <h1>ChalkMind Barebones API Tester</h1>
+  
+  <div class="panel">
+    <h2>1. Authentication (Guest)</h2>
+    <button id="btn-auth">Generate Guest ID</button>
+    <span id="guest-id-display" style="color:#10b981; font-family: monospace;">Not Authenticated</span>
+  </div>
+
+  <div class="panel">
+    <h2>2. Project & Chat</h2>
+    <input type="text" id="project-name" placeholder="Project Name" value="My Test Project" />
+    <button id="btn-create-proj" disabled>Create Project</button>
+    <br/><br/>
+    <input type="text" id="chat-title" placeholder="Chat Title" value="New Chat" />
+    <button id="btn-create-chat" disabled>Create Chat</button>
+    <br/><br/>
+    <div><strong>Active Project ID:</strong> <span id="active-proj">-</span></div>
+    <div><strong>Active Chat ID:</strong> <span id="active-chat">-</span></div>
+  </div>
+
+  <div class="panel">
+    <h2>3. Text Interface (Test AI Explanations & Visuals)</h2>
+    <input type="text" id="text-prompt" placeholder="Ask the Teaching Agent something..." style="width: 400px;" />
+    <button id="btn-send-text" disabled>Send Text</button>
+  </div>
+
+  <div class="panel">
+    <h2>4. Voice Interface (STT -> AI -> TTS)</h2>
+    <button id="btn-record" disabled>🎤 Start Recording</button>
+    <span id="recording-status" style="margin-left: 12px; color: #10b981;"></span>
+    
+    <div style="margin-top: 16px;">
+      <strong>Transcribed Text:</strong> <span id="transcribed-text" style="color: #cbd5e1;">-</span>
+    </div>
+    
+    <audio id="tts-audio" controls style="margin-top: 16px; width: 100%; outline: none;"></audio>
+  </div>
+
+  <div class="panel">
+    <h2>AI Response (Explanations & Visuals)</h2>
+    <strong>Title:</strong> <span id="ai-title">-</span>
+    <div id="ai-visuals" style="margin-top: 16px; display: flex; flex-direction: column; gap: 8px;">
+      <div style="color: #94a3b8;">Visual segments will appear here...</div>
+    </div>
+    <div style="margin-top: 16px;">
+      <strong>Raw JSON:</strong>
+      <pre id="ai-response-json">Waiting for input...</pre>
+    </div>
+  </div>
+
+  <script>
+    let guestId = localStorage.getItem('guestId');
+    let currentProjectId = null;
+    let currentChatId = null;
+    
+    let mediaRecorder = null;
+    let audioChunks = [];
+
+    const $ = id => document.getElementById(id);
+
+    // Initial load
+    if (guestId) {
+      $('guest-id-display').textContent = guestId;
+      enableButtons();
+    }
+
+    $('btn-auth').onclick = () => {
+      guestId = 'guest_' + Math.random().toString(36).substr(2, 10) + Math.random().toString(36).substr(2, 5);
+      localStorage.setItem('guestId', guestId);
+      $('guest-id-display').textContent = guestId;
+      enableButtons();
+    };
+
+    function enableButtons() {
+      $('btn-create-proj').disabled = false;
+      $('btn-create-chat').disabled = false;
+    }
+
+    $('btn-create-proj').onclick = async () => {
+      const res = await fetch('/api/projects', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-guest-id': guestId },
+        body: JSON.stringify({ name: $('project-name').value })
+      });
+      const data = await res.json();
+      currentProjectId = data.id;
+      $('active-proj').textContent = currentProjectId;
+    };
+
+    $('btn-create-chat').onclick = async () => {
+      if (!currentProjectId) return alert('Create a project first!');
+      const res = await fetch('/api/chats', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-guest-id': guestId },
+        body: JSON.stringify({ projectId: currentProjectId, title: $('chat-title').value })
+      });
+      const data = await res.json();
+      currentChatId = data.id;
+      $('active-chat').textContent = currentChatId;
+      $('btn-record').disabled = false;
+      $('btn-send-text').disabled = false;
+    };
+
+    $('btn-send-text').onclick = async () => {
+      const text = $('text-prompt').value;
+      if (!text) return;
+      $('btn-send-text').disabled = true;
+      $('recording-status').textContent = 'Sending text prompt...';
+      await handlePrompt(text, false);
+      $('btn-send-text').disabled = false;
+    };
+
+    // Voice Recording Logic
+    $('btn-record').onclick = async () => {
+      if (mediaRecorder && mediaRecorder.state === 'recording') {
+        mediaRecorder.stop();
+        $('btn-record').textContent = '🎤 Start Recording';
+        $('btn-record').classList.remove('recording');
+        $('recording-status').textContent = 'Processing...';
+        return;
+      }
+
+      if (!currentChatId) return alert('Create a chat first!');
+
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        mediaRecorder = new MediaRecorder(stream);
+        audioChunks = [];
+
+        mediaRecorder.ondataavailable = e => { if (e.data.size > 0) audioChunks.push(e.data); };
+        
+        mediaRecorder.onstop = async () => {
+          stream.getTracks().forEach(t => t.stop());
+          const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+          await handleVoiceFlow(audioBlob);
+        };
+
+        mediaRecorder.start();
+        $('btn-record').textContent = '⏹ Stop Recording';
+        $('btn-record').classList.add('recording');
+        $('recording-status').textContent = 'Recording...';
+      } catch (err) {
+        alert('Mic access denied');
+      }
+    };
+
+    async function handleVoiceFlow(audioBlob) {
+      // 1. Transcribe
+      $('recording-status').textContent = 'Transcribing audio...';
+      const fd = new FormData();
+      fd.append('audio', audioBlob, 'recording.webm');
+      
+      try {
+        const sttRes = await fetch('/api/audio/transcribe', {
+          method: 'POST',
+          headers: { 'x-guest-id': guestId },
+          body: fd
+        });
+        const sttData = await sttRes.json();
+        const transcribedText = sttData.text;
+        $('transcribed-text').textContent = transcribedText;
+
+        if (transcribedText) {
+          await handlePrompt(transcribedText, true);
+        } else {
+          $('recording-status').textContent = 'No speech detected.';
+        }
+      } catch (err) {
+        console.error(err);
+        $('recording-status').textContent = 'Transcription failed.';
+      }
+    }
+
+    async function handlePrompt(promptText, synthesizeAudio) {
+      // 2. Get AI Response
+      $('recording-status').textContent = 'Generating AI lesson...';
+      try {
+        const aiRes = await fetch(`/api/chats/${currentChatId}/message`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'x-guest-id': guestId },
+          body: JSON.stringify({ prompt: promptText, bloomLevel: 'understand' })
+        });
+        const aiData = await aiRes.json();
+        $('ai-response-json').textContent = JSON.stringify(aiData, null, 2);
+        
+        if (aiData.title) {
+          $('ai-title').textContent = aiData.title;
+        }
+
+        // Render visuals
+        if (aiData.newSegments) {
+          const visualsContainer = $('ai-visuals');
+          visualsContainer.innerHTML = ''; // clear previous
+          aiData.newSegments.forEach(seg => {
+            const segDiv = document.createElement('div');
+            segDiv.style.border = '1px solid #334155';
+            segDiv.style.padding = '12px';
+            segDiv.style.borderRadius = '6px';
+            segDiv.style.background = '#1e293b';
+            
+            let contentHtml = `<strong style="color: #3b82f6;">[${seg.type.toUpperCase()}]</strong> `;
+            if (seg.type === 'text' || seg.type === 'markdown' || seg.type === 'analogy') {
+              contentHtml += `<div style="margin-top: 8px;">${seg.content}</div>`;
+            } else if (seg.type === 'code') {
+              contentHtml += `<pre style="margin: 8px 0; background: #0f1115;">${seg.content}</pre>`;
+            } else if (seg.type === 'formula') {
+              contentHtml += `<div style="font-family: math; font-size: 1.2em; margin-top: 8px; color: #10b981;">${seg.content}</div>`;
+            } else if (seg.type === 'question') {
+              contentHtml += `<div style="margin-top: 8px; font-style: italic; color: #f59e0b;">Q: ${seg.content}</div>`;
+              if (seg.options) {
+                contentHtml += `<ul style="margin-top: 4px;">`;
+                seg.options.forEach(opt => { contentHtml += `<li>${opt}</li>`; });
+                contentHtml += `</ul>`;
+              }
+            } else if (seg.type === 'image') {
+              contentHtml += `<div style="margin-top: 8px; color: #a855f7;">[Image Prompt: ${seg.content}]</div>`;
+            } else {
+              contentHtml += `<div style="margin-top: 8px;">${seg.content}</div>`;
+            }
+            
+            segDiv.innerHTML = contentHtml;
+            visualsContainer.appendChild(segDiv);
+          });
+        }
+
+        if (synthesizeAudio && aiData.newMessages && aiData.newMessages.length > 0) {
+          const aiMsg = aiData.newMessages.find(m => m.role === 'ai');
+          if (aiMsg) {
+            // 3. Synthesize TTS
+            $('recording-status').textContent = 'Generating audio response...';
+            const ttsRes = await fetch('/api/audio/synthesize', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json', 'x-guest-id': guestId },
+              body: JSON.stringify({ text: aiMsg.content, voice: 'alloy' })
+            });
+            
+            if (ttsRes.ok) {
+              const ttsBlob = await ttsRes.blob();
+              const url = URL.createObjectURL(ttsBlob);
+              const audioEl = $('tts-audio');
+              audioEl.src = url;
+              audioEl.play();
+            } else {
+              $('recording-status').textContent = 'TTS generation failed.';
+            }
+          }
+        }
+        
+        $('recording-status').textContent = 'Done!';
+      } catch (err) {
+        console.error(err);
+        $('recording-status').textContent = 'Error occurred during AI processing.';
+      }
+    }
+  </script>
+</body>
+</html>

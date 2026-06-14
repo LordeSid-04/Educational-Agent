@@ -1,0 +1,11 @@
+Refer to the following components on the Aceternity UI Platform:
+1. Macbook Scroll (install command: npx shadcn@latest add @aceternity/macbook-scroll-demo) - [text](https://ui.aceternity.com/components/macbook-scroll)
+2. 3D Card Effect (install command: npx shadcn@latest add @aceternity/3d-card-effect-demo) - [text](https://ui.aceternity.com/components/3d-card-effect)
+3. Feature Sections (install command: npx shadcn@latest add @aceternity/feature-sections-demo) - [text](https://ui.aceternity.com/components/feature-sections)
+4. ASCII Art (install command: npx shadcn@latest add @aceternity/ascii-art-demo) - [text](https://ui.aceternity.com/components/ascii-art)
+5. Keyboard (install command: npx shadcn@latest add @aceternity/keyboard-demo) - [text](https://ui.aceternity.com/components/keyboard)
+6. Webcam Pixel Grid (install command: npx shadcn@latest add @aceternity/webcam-pixel-grid-demo) - [text](https://ui.aceternity.com/components/webcam-pixel-grid)
+7. Animated Testimonials (install command: npx shadcn@latest add @aceternity/animated-testimonials-demo) - [text](https://ui.aceternity.com/components/animated-testimonials)
+8. Comet Card (install command: npx shadcn@latest add @aceternity/comet-card-demo) - [text](https://ui.aceternity.com/components/comet-card) 
+9. Compare (install command: npx shadcn@latest add @aceternity/compare-demo) - [text](https://ui.aceternity.com/components/compare)
+10. World Map (install command: npx shadcn@latest add @aceternity/world-map-demo) - [text](https://ui.aceternity.com/components/world-map)
