@@ -72,9 +72,56 @@ function runMigrations(db) {
     CREATE INDEX IF NOT EXISTS idx_projects_guest_id ON projects(guest_id);
     CREATE INDEX IF NOT EXISTS idx_chats_project_id ON chats(project_id);
     CREATE INDEX IF NOT EXISTS idx_messages_chat_id ON messages(chat_id);
+
+    CREATE TABLE IF NOT EXISTS documents (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      project_id INTEGER NOT NULL,
+      filename TEXT NOT NULL,
+      status TEXT DEFAULT 'processing',
+      raw_text TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE
+    );
+
+    CREATE TABLE IF NOT EXISTS topics (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      document_id INTEGER NOT NULL,
+      title TEXT NOT NULL,
+      order_index INTEGER NOT NULL,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (document_id) REFERENCES documents(id) ON DELETE CASCADE
+    );
+
+    CREATE TABLE IF NOT EXISTS nodes (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      topic_id INTEGER NOT NULL,
+      title TEXT NOT NULL,
+      content_text TEXT,
+      segments_json TEXT,
+      order_index INTEGER NOT NULL,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (topic_id) REFERENCES topics(id) ON DELETE CASCADE
+    );
+
+    CREATE TABLE IF NOT EXISTS student_profiles (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id INTEGER,
+      guest_id TEXT,
+      topic_id INTEGER,
+      competency_level INTEGER DEFAULT 1,
+      frustration_index REAL DEFAULT 0.0,
+      last_evaluated DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+      FOREIGN KEY (topic_id) REFERENCES topics(id) ON DELETE CASCADE
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_documents_project_id ON documents(project_id);
+    CREATE INDEX IF NOT EXISTS idx_topics_document_id ON topics(document_id);
+    CREATE INDEX IF NOT EXISTS idx_nodes_topic_id ON nodes(topic_id);
+    CREATE INDEX IF NOT EXISTS idx_student_profiles_user_guest ON student_profiles(user_id, guest_id);
   `);
 
-  console.log('[DB] SQLite migrations complete (projects/chats/messages initialized)');
+  console.log('[DB] SQLite migrations complete (projects/chats/messages/knowledge-graph initialized)');
 }
 
 // --- Projects CRUD ---
@@ -228,5 +275,69 @@ export function closeDatabase() {
     db.close();
     db = null;
     console.log('[DB] Database connection closed');
+  }
+}
+
+// --- Documents CRUD ---
+export function createDocument(projectId, filename, status = 'processing') {
+  const db = getDatabase();
+  const stmt = db.prepare(`INSERT INTO documents (project_id, filename, status) VALUES (?, ?, ?)`);
+  return stmt.run(projectId, filename, status).lastInsertRowid;
+}
+export function updateDocumentStatus(documentId, status, rawText = null) {
+  const db = getDatabase();
+  if (rawText !== null) {
+    const stmt = db.prepare(`UPDATE documents SET status = ?, raw_text = ? WHERE id = ?`);
+    return stmt.run(status, rawText, documentId);
+  }
+  const stmt = db.prepare(`UPDATE documents SET status = ? WHERE id = ?`);
+  return stmt.run(status, documentId);
+}
+export function getDocumentsForProject(projectId) {
+  const db = getDatabase();
+  return db.prepare(`SELECT * FROM documents WHERE project_id = ? ORDER BY created_at DESC`).all(projectId);
+}
+
+// --- Topics & Nodes CRUD ---
+export function createTopic(documentId, title, orderIndex) {
+  const db = getDatabase();
+  const stmt = db.prepare(`INSERT INTO topics (document_id, title, order_index) VALUES (?, ?, ?)`);
+  return stmt.run(documentId, title, orderIndex).lastInsertRowid;
+}
+export function createNode(topicId, title, contentText, segmentsJson, orderIndex) {
+  const db = getDatabase();
+  const stmt = db.prepare(`INSERT INTO nodes (topic_id, title, content_text, segments_json, order_index) VALUES (?, ?, ?, ?, ?)`);
+  return stmt.run(topicId, title, contentText, JSON.stringify(segmentsJson || []), orderIndex).lastInsertRowid;
+}
+export function getTopicsForDocument(documentId) {
+  const db = getDatabase();
+  return db.prepare(`SELECT * FROM topics WHERE document_id = ? ORDER BY order_index ASC`).all(documentId);
+}
+export function getNodesForTopic(topicId) {
+  const db = getDatabase();
+  const rows = db.prepare(`SELECT * FROM nodes WHERE topic_id = ? ORDER BY order_index ASC`).all(topicId);
+  return rows.map(r => ({ ...r, segments: JSON.parse(r.segments_json || '[]') }));
+}
+
+// --- Student Profiles CRUD ---
+export function getStudentProfile(userId, guestId, topicId = null) {
+  const db = getDatabase();
+  let stmt;
+  if (topicId) {
+    stmt = db.prepare(`SELECT * FROM student_profiles WHERE (user_id = ? OR guest_id = ?) AND topic_id = ?`);
+    return stmt.get(userId, guestId, topicId);
+  }
+  stmt = db.prepare(`SELECT * FROM student_profiles WHERE (user_id = ? OR guest_id = ?) AND topic_id IS NULL`);
+  return stmt.get(userId, guestId);
+}
+export function updateStudentProfile(userId, guestId, topicId, competencyLevel, frustrationIndex) {
+  const db = getDatabase();
+  const existing = getStudentProfile(userId, guestId, topicId);
+  if (existing) {
+    const stmt = db.prepare(`UPDATE student_profiles SET competency_level = ?, frustration_index = ?, last_evaluated = CURRENT_TIMESTAMP WHERE id = ?`);
+    return stmt.run(competencyLevel, frustrationIndex, existing.id);
+  } else {
+    const stmt = db.prepare(`INSERT INTO student_profiles (user_id, guest_id, topic_id, competency_level, frustration_index) VALUES (?, ?, ?, ?, ?)`);
+    return stmt.run(userId || null, userId ? null : (guestId || ''), topicId, competencyLevel, frustrationIndex);
   }
 }

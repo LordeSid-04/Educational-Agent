@@ -15,7 +15,7 @@ import { lessonCache } from '../middleware/cache.js';
 export class TeachingAgent {
   constructor() {
     this._openai = null;
-    this.model = 'gpt-4o'; // Best model for strict structured outputs
+    this.model = 'gpt-4o-mini'; // Prioritizing speed and conversational latency
   }
 
   get openai() {

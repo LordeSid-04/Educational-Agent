@@ -36,13 +36,21 @@
   </div>
 
   <div class="panel">
-    <h2>3. Text Interface (Test AI Explanations & Visuals)</h2>
+    <h2>3. Document Ingestion (Background Processing)</h2>
+    <input type="file" id="file-upload" accept=".pdf,.txt" style="margin-bottom: 8px;" />
+    <br/>
+    <button id="btn-upload" disabled>Upload & Process</button>
+    <span id="upload-status" style="margin-left: 12px; color: #10b981;"></span>
+  </div>
+
+  <div class="panel">
+    <h2>4. Text Interface (Test AI Explanations & Visuals)</h2>
     <input type="text" id="text-prompt" placeholder="Ask the Teaching Agent something..." style="width: 400px;" />
     <button id="btn-send-text" disabled>Send Text</button>
   </div>
 
   <div class="panel">
-    <h2>4. Voice Interface (STT -> AI -> TTS)</h2>
+    <h2>5. Voice Interface (STT -> AI -> TTS)</h2>
     <button id="btn-record" disabled>🎤 Start Recording</button>
     <span id="recording-status" style="margin-left: 12px; color: #10b981;"></span>
     
@@ -102,20 +110,47 @@
       const data = await res.json();
       currentProjectId = data.id;
       $('active-proj').textContent = currentProjectId;
+      $('btn-upload').disabled = false;
     };
 
     $('btn-create-chat').onclick = async () => {
       if (!currentProjectId) return alert('Create a project first!');
-      const res = await fetch('/api/chats', {
+      const res = await fetch(`/api/projects/${currentProjectId}/chats`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'x-guest-id': guestId },
-        body: JSON.stringify({ projectId: currentProjectId, title: $('chat-title').value })
+        body: JSON.stringify({ title: $('chat-title').value })
       });
       const data = await res.json();
       currentChatId = data.id;
       $('active-chat').textContent = currentChatId;
       $('btn-record').disabled = false;
       $('btn-send-text').disabled = false;
+    };
+
+    $('btn-upload').onclick = async () => {
+      const fileInput = $('file-upload');
+      if (!fileInput.files.length) return alert('Select a file first!');
+      if (!currentProjectId) return alert('Create a project first!');
+
+      const formData = new FormData();
+      formData.append('file', fileInput.files[0]);
+      formData.append('projectId', currentProjectId);
+
+      $('btn-upload').disabled = true;
+      $('upload-status').textContent = 'Uploading...';
+
+      try {
+        const res = await fetch('/api/upload', {
+          method: 'POST',
+          headers: { 'x-guest-id': guestId },
+          body: formData
+        });
+        const data = await res.json();
+        $('upload-status').textContent = data.message || (data.error ? 'Error: ' + data.error : 'Uploaded');
+      } catch (err) {
+        $('upload-status').textContent = 'Upload failed';
+      }
+      $('btn-upload').disabled = false;
     };
 
     $('btn-send-text').onclick = async () => {
@@ -216,23 +251,25 @@
             segDiv.style.background = '#1e293b';
             
             let contentHtml = `<strong style="color: #3b82f6;">[${seg.type.toUpperCase()}]</strong> `;
-            if (seg.type === 'text' || seg.type === 'markdown' || seg.type === 'analogy') {
-              contentHtml += `<div style="margin-top: 8px;">${seg.content}</div>`;
-            } else if (seg.type === 'code') {
-              contentHtml += `<pre style="margin: 8px 0; background: #0f1115;">${seg.content}</pre>`;
-            } else if (seg.type === 'formula') {
-              contentHtml += `<div style="font-family: math; font-size: 1.2em; margin-top: 8px; color: #10b981;">${seg.content}</div>`;
-            } else if (seg.type === 'question') {
-              contentHtml += `<div style="margin-top: 8px; font-style: italic; color: #f59e0b;">Q: ${seg.content}</div>`;
-              if (seg.options) {
+            if (seg.type === 'heading') {
+              contentHtml += `<h3 style="margin-top: 8px; color: #fff;">${seg.content.text}</h3>`;
+            } else if (seg.type === 'text' || seg.type === 'step_marker') {
+              contentHtml += `<div style="margin-top: 8px;">${seg.content.text}</div>`;
+            } else if (seg.type === 'math') {
+              contentHtml += `<div style="font-family: math; font-size: 1.2em; margin-top: 8px; color: #10b981;">$$ ${seg.content.latex} $$</div>`;
+            } else if (seg.type === 'checkpoint') {
+              contentHtml += `<div style="margin-top: 8px; font-style: italic; color: #f59e0b;">Q: ${seg.content.question}</div>`;
+              if (seg.content.options) {
                 contentHtml += `<ul style="margin-top: 4px;">`;
-                seg.options.forEach(opt => { contentHtml += `<li>${opt}</li>`; });
+                seg.content.options.forEach((opt, idx) => { 
+                  let isCorrect = (idx === seg.content.correctIndex);
+                  contentHtml += `<li style="${isCorrect ? 'color:#10b981; font-weight:bold;' : ''}">${opt}</li>`; 
+                });
                 contentHtml += `</ul>`;
+                contentHtml += `<div style="margin-top: 4px; font-size: 0.9em; color: #94a3b8;">Exp: ${seg.content.explanation}</div>`;
               }
-            } else if (seg.type === 'image') {
-              contentHtml += `<div style="margin-top: 8px; color: #a855f7;">[Image Prompt: ${seg.content}]</div>`;
             } else {
-              contentHtml += `<div style="margin-top: 8px;">${seg.content}</div>`;
+              contentHtml += `<pre style="margin: 8px 0; background: #0f1115; font-size: 0.8em; overflow-x: auto;">${JSON.stringify(seg.content, null, 2)}</pre>`;
             }
             
             segDiv.innerHTML = contentHtml;

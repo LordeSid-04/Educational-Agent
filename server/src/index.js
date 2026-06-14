@@ -8,6 +8,7 @@ import lessonRoutes from './routes/lesson.js';
 import authRoutes from './routes/auth.js';
 import projectRoutes from './routes/project.js';
 import chatRoutes from './routes/chat.js';
+import uploadRoutes from './routes/upload.js';
 import { requestLogger, errorHandler } from './middleware/logger.js';
 import { lessonCache } from './middleware/cache.js';
 import { getDatabase, closeDatabase } from './db/database.js';
@@ -80,6 +81,7 @@ app.use('/api/lesson', lessonRoutes);
 app.use('/api/projects', projectRoutes);
 app.use('/api/chats', chatRoutes);
 app.use('/api/audio', audioRoutes);
+app.use('/api/upload', uploadRoutes);
 
 // --- Health Check ---
 app.get('/api/health', (req, res) => {
