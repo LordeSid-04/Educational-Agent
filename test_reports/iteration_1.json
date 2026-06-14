@@ -1,0 +1,43 @@
+{
+  "summary": "Full backend + frontend E2E testing of ChalkMind completed. 16/16 backend pytest cases pass (health, auth register/login/me/validation, projects CRUD, full guest chat flow with 13-segment lesson + checkpoint, lesson/continue/clarify, mocked audio transcribe). Frontend UI flows verified end-to-end through Playwright: landing -> sign-up modal -> register -> /app workspace -> all 4 dock items present -> Teaching Agent prompt -> thinking state -> whiteboard lesson with checkpoint -> checkpoint submit + Continue follow-up -> sidebar new-collection + toggle -> demo login -> guest mode prompt -> logout. Two minor UI overlap issues observed but no functional blockers.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [
+      {"component": "TeachingPanel / Checkpoint / BloomSelector", "issue": "The bloom-select pills row (DEPTH/REMEMBER/UNDERSTAND/APPLY/ANALYZE/EVALUATE/CREATE) is rendered at a fixed/absolute position that sits BEHIND the Checkpoint panel, so when a checkpoint is on screen the bloom pills are partially obscured by the checkpoint container and the 'Check answer' button visually overlaps the bloom pills row. Affects /app teaching agent view whenever the last segment is a checkpoint.", "selector": "[data-testid=\"bloom-select\"] vs checkpoint container", "priority": "MEDIUM"},
+      {"component": "Workspace topbar title", "issue": "Active chat title in the topbar is clipped by the user-menu pill on the right (e.g. 'Neural Networks' renders as 'Neural Networ'). Needs truncate/ellipsis with min-width or right-padding for the topbar buttons.", "selector": "header chat-title region next to user-menu", "priority": "LOW"}
+    ],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "Teaching Agent whiteboard", "issues": ["Bloom-select pills row overlaps with checkpoint card content — z-index / layout conflict"]}
+    ]
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_chalkmind_api.py",
+    "/app/test_reports/pytest/pytest_results.xml"
+  ],
+  "action_items": [
+    "Fix z-index / layout so bloom-select pills aren't covered by the checkpoint panel (move bloom selector inside the panel header or raise its z-index above checkpoint card).",
+    "Add truncate/ellipsis + right-padding on the workspace topbar chat-title so it doesn't get clipped by the Exit/user-menu buttons."
+  ],
+  "critical_code_review_comments": [
+    "Landing.jsx onAuthed always navigates to /app (`if (pendingEnter || true)`) — the `|| true` short-circuit makes the `pendingEnter` flag dead code; if intentional, remove the flag, otherwise this is a latent bug.",
+    "server.py uses Starlette deprecated `@app.on_event('startup'/'shutdown')` — migrate to lifespan handler for future FastAPI compatibility.",
+    "server.py: on demo seed startup, if password was changed externally the seed never updates the bcrypt hash. Consider idempotent seed (update password_hash if it doesn't verify).",
+    "Workspace.jsx ensureChat creates a chat even when activeProject already exists implicitly via fallback — race possible if user clicks send before projects load; consider awaiting projects state before sending.",
+    "CORS_ORIGINS='*' combined with allow_credentials=True is invalid per CORS spec and many browsers will reject; should list explicit origins or set allow_credentials=False."
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_chalkmind_api.py",
+    "/app/backend/tests/__init__.py"
+  ],
+  "success_rate": {"backend": "100% (16/16)", "frontend": "100% of tested flows (auth register, demo login, guest mode, dock nav, prompt -> thinking -> lesson -> checkpoint -> continue, sidebar, collections, settings logout)"},
+  "test_credentials": "demo / demo123 (seeded). Also registered transient TEST_/t1_* users during test.",
+  "seed_data_creation": "Each test run creates ephemeral guest projects + chats (auto-cleaned by deletes in test) and a random t1_<rand> user via Playwright.",
+  "retest_needed": false,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "Backend test file is /app/backend/tests/test_chalkmind_api.py (reads REACT_APP_BACKEND_URL from /app/frontend/.env). To reproduce the bloom/checkpoint overlap visually: register or guest into /app, click dock-item-agent, submit any prompt, wait for the checkpoint segment to render — the bloom-select pills row is partially hidden behind the checkpoint card. Workspace title clip is visible when chat title >~15 chars (e.g., 'Neural Networks').",
+  "rca of the issue": "Bloom selector overlap: TeachingPanel renders the bloom-select bar at a fixed offset above the prompt input, while the Checkpoint segment grows the whiteboard vertically and the checkpoint card's z-index/background covers the bloom row at that scroll position. Title clip RCA: topbar uses absolute positioning for Exit + user-menu without reserving horizontal space, so the chat title element extends under those buttons and is visually cut off."
+}
