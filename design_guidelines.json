@@ -1,0 +1,132 @@
+{
+  "theme_and_archetype": {
+    "domain": "Student Productivity / Teaching Agent",
+    "theme": "DARK",
+    "archetype": "7_Electric_Neon_Hybrid_with_Luxury",
+    "description": "A highly immersive, stylized 3D animation look (Spider-Verse inspired) mixed with gritty NYC underground aesthetic. A dark mode base offset by warm incandescent light, glowing neon highlights, and graffiti accents."
+  },
+  "colors": {
+    "base": {
+      "obsidian_black": "#050505",
+      "subway_shadow": "#0A0A0F",
+      "glass_panel": "rgba(10, 10, 15, 0.65)"
+    },
+    "accents": {
+      "incandescent_warm": "#FF5C00",
+      "neon_cyan": "#00F0FF",
+      "neon_magenta": "#FF003C",
+      "graffiti_yellow": "#FAFF00"
+    },
+    "whiteboard_panel": {
+      "background": "#FAFAFA",
+      "text": "#050505",
+      "halftone_grid": "#E5E5E5",
+      "accent": "#000000"
+    },
+    "text": {
+      "primary": "#FFFFFF",
+      "secondary": "#A0A0AB",
+      "muted": "#70707A"
+    },
+    "borders": {
+      "subtle_glass": "rgba(255, 255, 255, 0.1)",
+      "neon_glow": "rgba(0, 240, 255, 0.4)",
+      "whiteboard_edge": "#000000"
+    }
+  },
+  "typography": {
+    "fonts": {
+      "heading": "Unbounded, sans-serif",
+      "body": "Outfit, sans-serif",
+      "mono": "JetBrains Mono, monospace"
+    },
+    "scales": {
+      "h1": "text-5xl sm:text-6xl lg:text-7xl font-black uppercase tracking-tighter leading-none",
+      "h2": "text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight",
+      "h3": "text-xl sm:text-2xl font-bold",
+      "body": "text-base leading-relaxed",
+      "label": "text-xs tracking-[0.2em] uppercase font-mono font-bold"
+    },
+    "special_treatments": {
+      "comic_heading": "Add a slight text-shadow or offset layer to simulate misregistered print/halftone on major hero headings.",
+      "code_blocks": "Use JetBrains Mono, strict styling with brutalist borders."
+    }
+  },
+  "layout_and_spacing": {
+    "philosophy": "Asymmetric, overlapping organic grids for marketing. High density but structurally rigid 'control room' grid for the workspace.",
+    "workspace_wrapper": "h-screen w-screen overflow-hidden flex bg-obsidian_black relative",
+    "glass_panels": "backdrop-blur-2xl bg-glass_panel border border-subtle_glass shadow-2xl",
+    "whiteboard_container": "rounded-2xl border-2 border-whiteboard_edge bg-whiteboard_panel shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] overflow-hidden"
+  },
+  "components": {
+    "hero_section": {
+      "description": "Full-viewport fixed section containing the subway background image. It uses Framer Motion's useScroll and useTransform.",
+      "interaction": "As user scrolls down, the entire scene scales up massively (e.g., scale: 1 to 30) with the transform origin anchored perfectly to the laptop screen in the image. Once the laptop screen fills the viewport, opacity fades to reveal the actual App Workspace.",
+      "elements": [
+        "Male protagonist hero image as base layer.",
+        "Spinning vinyl record absolutely positioned at bottom right, rotating continuously via CSS.",
+        "Halftone dot overlays for texture."
+      ]
+    },
+    "magnetic_dock": {
+      "description": "Bottom-aligned macOS-style navigation dock.",
+      "styling": "Glassmorphic pill (backdrop-blur-2xl, bg-black/50, border-white/10).",
+      "interaction": "On hover over an icon, it scales up, pushing neighbors slightly (framer-motion or CSS scale with sibling combinators). Active state has a glowing neon_cyan dot below the icon."
+    },
+    "collapsible_sidebar": {
+      "description": "Left-aligned glassmorphic sidebar for Collections > Topics > Nodes.",
+      "styling": "w-64 h-full bg-black/40 backdrop-blur-xl border-r border-white/10.",
+      "interaction": "Collapsible to icon-only via a toggle button. Uses 'JetBrains Mono' for node labels to feel technical."
+    },
+    "teaching_agent_panel": {
+      "description": "The main stage. A massive, single-panel whiteboard/chat.",
+      "styling": "Brutalist Black & White. Pure white or off-white background, pure black text. 2px solid black borders. A subtle halftone dot pattern in the background.",
+      "layout": "Contains the AI structured visual lesson segments (headings, text, math, diagrams, tables).",
+      "ai_thinking_state": "While loading, show a glowing neon magenta/cyan particle cluster overlaying the black&white canvas, breaking the monochrome rule to indicate AI activity."
+    },
+    "prompt_input": {
+      "description": "Floating Claude-style input box at bottom center.",
+      "styling": "Rounded-3xl, pure white background for contrast (or glass dark), heavy drop shadow. Right-aligned microphone button.",
+      "interaction": "Inner glow/border animates when voice dictation is active."
+    },
+    "collection_surfer": {
+      "description": "3D perspective track browser for study materials.",
+      "implementation": "A container with CSS perspective (e.g., perspective: 1000px). Cards have rotateX and translateZ to look like they are receding into the distance.",
+      "styling": "Cards feature glowing neon borders and graffiti textures on hover."
+    }
+  },
+  "motion_and_animations": {
+    "scroll_zoom": "Use Framer Motion. `const scale = useTransform(scrollY, [0, 1000], [1, 30])`. Ensure `transformOrigin` matches the laptop screen coordinates in the image.",
+    "hover_lift": "Interactive cards translate-y-[-4px] with increased neon box-shadow.",
+    "thinking_particles": "Animate a cluster of dots or use 'react-tsparticles' with a Spider-Verse glitch/halftone config."
+  },
+  "media_assets": [
+    {
+      "category": "hero_background",
+      "url": "https://customer-assets.emergentagent.com/job_23b4cb8f-d6bb-406e-bbc9-6dab8b7f565e/artifacts/aj03hod3_gemini-2.5-flash-image_refer_to_the_images_above._im_trying_to_design_a_3D_landing_page_for_a_website_u-0.jpg",
+      "description": "Subway train car interior with male protagonist in headphones"
+    },
+    {
+      "category": "subway_aesthetic_texture",
+      "url": "https://images.unsplash.com/photo-1720461307190-32a77e4d96b6?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzOTB8MHwxfHNlYXJjaHwzfHxuZW9uJTIwZ3JhZmZpdGklMjBzdWJ3YXklMjB0ZXh0dXJlJTIwZGFya3xlbnwwfHx8fDE3ODE0NDM4MjR8MA&ixlib=rb-4.1.0&q=85",
+      "description": "Gritty neon graffiti tunnel texture to blend into backgrounds"
+    },
+    {
+      "category": "spinning_vinyl_texture",
+      "url": "https://images.unsplash.com/photo-1763068795839-565fcd5e19cc?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzMjh8MHwxfHNlYXJjaHwyfHxzcGlubmluZyUyMHZpbnlsJTIwcmVjb3JkJTIwZGFyayUyMGJhY2tncm91bmR8ZW58MHx8fHwxNzgxNDQzODI0fDA&ixlib=rb-4.1.0&q=85",
+      "description": "Abstract colorful motion blur imitating a spinning record"
+    }
+  ],
+  "icons_library": "lucide-react",
+  "accessibility_and_testing": {
+    "testing_attributes": "All interactive elements MUST include data-testid attributes (e.g., data-testid='prompt-submit-button').",
+    "contrast": "Strict APCA/WCAG contrast compliance. Dark mode text must be bright enough, Whiteboard text must be pure black."
+  },
+  "instructions_to_main_agent": [
+    "Build standard React components using Tailwind CSS.",
+    "Do NOT use HTML input elements directly; use highly customized Shadcn components for inputs, dialogs, etc.",
+    "Implement Framer Motion for the hero scroll-zoom transition; it is critical for the 'cinematic' requirement.",
+    "For the Teaching Agent whiteboard, enforce a brutalist Black & White aesthetic to contrast against the neon dark mode of the surrounding app.",
+    "Do NOT use placeholder images. Use ONLY the provided URLs in the media_assets array."
+  ]
+}
