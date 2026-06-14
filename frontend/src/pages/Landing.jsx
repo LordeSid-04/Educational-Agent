@@ -10,14 +10,10 @@ export default function Landing() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [authOpen, setAuthOpen] = useState(false);
-  const [pendingEnter, setPendingEnter] = useState(false);
 
   const enterWorkspace = () => {
     if (user) navigate('/app');
-    else {
-      setPendingEnter(true);
-      setAuthOpen(true);
-    }
+    else setAuthOpen(true);
   };
 
   return (
@@ -33,11 +29,10 @@ export default function Landing() {
         open={authOpen}
         onClose={() => {
           setAuthOpen(false);
-          setPendingEnter(false);
         }}
         onAuthed={() => {
           setAuthOpen(false);
-          if (pendingEnter || true) navigate('/app');
+          navigate('/app');
         }}
       />
     </main>

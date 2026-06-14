@@ -25,18 +25,18 @@ export default function TeachingPanel({ title, segments, thinking, busy, bloom, 
   return (
     <div data-testid={CM.teachingPanel} className="flex flex-col h-full relative">
       {/* header */}
-      <div className="shrink-0 px-6 sm:px-10 pt-5 pb-3 flex items-center gap-3">
-        <span className="grid place-items-center w-9 h-9 rounded-xl bg-white/[0.06] border border-white/10 text-cyan">
+      <div className="shrink-0 px-6 sm:px-10 pt-5 pb-3 flex items-center gap-3 pr-44">
+        <span className="grid place-items-center w-9 h-9 rounded-xl bg-white/[0.06] border border-white/10 text-cyan shrink-0">
           <GraduationCap size={18} />
         </span>
-        <div>
+        <div className="min-w-0">
           <p className="font-mono text-[10px] tracking-[0.25em] uppercase text-ash">Teaching Agent</p>
-          <h1 className="font-display font-bold text-lg leading-none mt-0.5">{title || 'The Chalkboard'}</h1>
+          <h1 className="font-display font-bold text-lg leading-none mt-0.5 truncate">{title || 'The Chalkboard'}</h1>
         </div>
       </div>
 
       {/* board */}
-      <div ref={scrollRef} className="flex-1 overflow-y-auto px-4 sm:px-8 pb-44">
+      <div ref={scrollRef} className="flex-1 overflow-y-auto px-4 sm:px-8 pb-56">
         <div className="mx-auto max-w-4xl mt-2">
           <div className="relative rounded-3xl border-2 border-black bg-paper whiteboard-shadow min-h-[60vh]">
             <div className="halftone-dark absolute inset-0 opacity-30 rounded-3xl pointer-events-none" />
@@ -59,8 +59,11 @@ export default function TeachingPanel({ title, segments, thinking, busy, bloom, 
       </div>
 
       {/* floating prompt */}
-      <div className="absolute bottom-24 inset-x-0 px-4 z-30">
-        <PromptInput onSubmit={onSubmit} busy={busy} bloom={bloom} setBloom={setBloom} />
+      <div className="absolute bottom-0 inset-x-0 px-4 pb-[88px] z-40 pointer-events-none">
+        <div className="absolute inset-0 -z-10 bg-gradient-to-t from-ink via-ink/95 to-transparent" />
+        <div className="pointer-events-auto">
+          <PromptInput onSubmit={onSubmit} busy={busy} bloom={bloom} setBloom={setBloom} />
+        </div>
       </div>
     </div>
   );
